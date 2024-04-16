@@ -5,7 +5,8 @@ module.exports = merge(common, {
   mode: 'development',
   devtool: 'inline-source-map',
   devServer: {
-    static: './dist'
+    static: './dist',
+    watchFiles: ['src/**/*.js', 'src/**/*.css', 'src/**/*.html']
   },
   optimization: {
     runtimeChunk: 'single'

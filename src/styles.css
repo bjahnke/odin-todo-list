@@ -2,20 +2,28 @@ body {
     background-color: lightblue;
 }
 
-#title {
+h1, h2 {
     text-align: center;
     color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 #main-container {
     display: flex;
+    justify-content: start;
+    gap: 18px
+}
+
+#todo-container {
+    display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    flex: 2 3 0;
 }
 
 .todo {
-    margin: 24px;
+    display: flex;
+    flex-direction: column;
+    margin: 24px 10% 24px 0;
     padding: 16px;
     border: 1px dashed #ccc;
     border-radius: 8px;
@@ -26,19 +34,63 @@ body {
 
 .todo .input-field {
     display: flex;
-    justify-content: space-between;
+    justify-content: start;
+    align-items: center;
     gap: 8px;
     margin: 8px 0;
 }
 
-.todo .input-field input {
+.todo .input-field .input {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    flex: auto;
+
 }
 
 .todo .input-field label {
     font-size: 16px;
-    align-self: center;
 }
 
+.todo .input-field .description {
+    resize: none; 
+}
+
+#project-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+
+#project-list button {
+    display: block;
+
+}
+
+#new-project-form {
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+}
+
+.delete {
+    cursor: pointer;
+    align-self: end;
+}
+
+.delete:hover {
+    color: red;
+}
+
+#new-task {
+    margin: 0 35%;
+    flex-basis: 2rem;
+}
+
+#projects {
+    flex: 1 1 0;
+    position: sticky;
+    top: 10%;
+}
