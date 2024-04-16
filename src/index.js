@@ -1,4 +1,4 @@
-import todoContainer from './todo.js'
+import todoContainer from './components.js'
 import './styles.css'
 
 document.querySelector('#new-task').addEventListener('click', () => {
@@ -27,3 +27,4 @@ document.querySelector('#add-project').addEventListener('click', (event) => {
   projectInput.value = ''
   projectInput.focus()
 })
+
