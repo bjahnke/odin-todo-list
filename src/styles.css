@@ -1,0 +1,44 @@
+body {
+    background-color: lightblue;
+}
+
+#title {
+    text-align: center;
+    color: white;
+}
+
+#main-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.todo {
+    margin: 24px;
+    padding: 16px;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    background-color: white;
+
+}
+
+.todo .input-field {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 8px 0;
+}
+
+.todo .input-field input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.todo .input-field label {
+    font-size: 16px;
+    align-self: center;
+}
+
