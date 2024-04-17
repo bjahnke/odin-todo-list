@@ -1,30 +1,14 @@
-import todoContainer from './components.js'
 import './styles.css'
+import { InputComponent, ButtonComponent, NewProjectComponent, ProjectListComponent, ProjectContainerComponent } from './scratch'
 
-document.querySelector('#new-task').addEventListener('click', () => {
-  const todo = todoContainer(document)
-  document.querySelector('#todo-list').append(todo)
-  window.scrollTo(0, document.querySelector('#todo-list').scrollHeight)
-})
+function main (doc) {
+  const inputComponent = new InputComponent(doc, 'project-name-input')
+  const buttonComponent = new ButtonComponent(doc, 'add-project-button')
+  const newProjectComponent = new NewProjectComponent(inputComponent, buttonComponent)
+  const projectListComponent = new ProjectListComponent(doc, 'project-list')
+  const projectContainerComponent = new ProjectContainerComponent(projectListComponent, newProjectComponent)
 
-document.querySelector('#add-project').addEventListener('click', (event) => {
-  event.preventDefault()
-  const projectInput = document.querySelector('#project-name-input')
-  const projectName = projectInput.value.trim()
-  const projectSlug = projectName.toLowerCase().replace(' ', '-')
-  if (projectSlug === '') {
-    return
-  }
-  if (document.querySelector(`#${projectSlug}`)) {
-    alert(`Project ${projectName} already exists! Please enter a different name.`)
-    return
-  }
-  const project = document.createElement('button')
-  project.textContent = projectName
-  project.id = projectSlug
-  project.className = 'project-button'
-  document.querySelector('#project-list').append(project)
-  projectInput.value = ''
-  projectInput.focus()
-})
+  projectListComponent.add('Default Project')
+}
 
+main(document)

@@ -1,8 +1,12 @@
+* {
+    border-radius: 4px;
+}
 body {
     background-color: lightblue;
 }
 
-h1, h2 {
+h1,
+h2 {
     text-align: center;
     color: white;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -14,46 +18,47 @@ h1, h2 {
     gap: 18px
 }
 
-#todo-container {
+#task-container {
     display: flex;
     flex-direction: column;
     flex: 2 3 0;
+    background-color: #fa541c7d;
+    justify-content: center;
 }
 
-.todo {
+.task {
     display: flex;
     flex-direction: column;
-    margin: 24px 10% 24px 0;
+    margin: 24px;
     padding: 16px;
     border: 1px dashed #ccc;
-    border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     background-color: white;
 
 }
 
-.todo .input-field {
-    display: flex;
+.task .input-field {
+    display: inline-flex;
     justify-content: start;
     align-items: center;
     gap: 8px;
     margin: 8px 0;
+    
 }
 
-.todo .input-field .input {
+.task .input-field .input {
     padding: 8px;
     border: 1px solid #ccc;
-    border-radius: 4px;
     flex: auto;
 
 }
 
-.todo .input-field label {
+.task .input-field label {
     font-size: 16px;
 }
 
-.todo .input-field .description {
-    resize: none; 
+.task .input-field .description {
+    resize: none;
 }
 
 #project-list {
@@ -86,7 +91,7 @@ h1, h2 {
 }
 
 #new-task {
-    margin: 0 35%;
+    margin: 8px 35%;
     flex-basis: 2rem;
 }
 
@@ -94,4 +99,17 @@ h1, h2 {
     flex: 1 1 0;
     position: sticky;
     top: 10%;
+}
+
+.task .input.due-date {
+    flex: 0 0 auto;
+}
+
+.task .input.priority {
+    flex: 0 0 auto;
+}
+
+.task .input-field.top {
+    justify-content: space-between;
+    align-items: start;
 }
