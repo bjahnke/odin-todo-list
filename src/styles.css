@@ -90,7 +90,7 @@ h2 {
     color: red;
 }
 
-#new-task {
+#new-task-button {
     margin: 8px 35%;
     flex-basis: 2rem;
 }

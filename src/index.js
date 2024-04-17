@@ -1,14 +1,20 @@
 import './styles.css'
-import { InputComponent, ButtonComponent, NewProjectComponent, ProjectListComponent, ProjectContainerComponent } from './scratch'
+import * as component from './scratch'
 
-function main (doc) {
-  const inputComponent = new InputComponent(doc, 'project-name-input')
-  const buttonComponent = new ButtonComponent(doc, 'add-project-button')
-  const newProjectComponent = new NewProjectComponent(inputComponent, buttonComponent)
-  const projectListComponent = new ProjectListComponent(doc, 'project-list')
-  const projectContainerComponent = new ProjectContainerComponent(projectListComponent, newProjectComponent)
+class Main {
+  static run (doc) {
+    const inputComponent = new component.Input(doc, 'project-name-input')
+    const buttonComponent = new component.Button(doc, 'add-project-button')
+    const newProjectComponent = new component.NewProjectComponent(inputComponent, buttonComponent)
+    const projectListComponent = new component.ProjectList(doc, 'project-list')
+    const projectContainerComponent = new component.ProjectContainer(projectListComponent, newProjectComponent)
 
-  projectListComponent.add('Default Project')
+    const defaultProject = projectListComponent.add('Default Project')
+    defaultProject.render()
+    // render the default project list
+  }
+
+  static renderProjectList () {}
 }
 
-main(document)
+Main.run(document)

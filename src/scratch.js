@@ -1,4 +1,4 @@
-export class Component {
+class Component {
   constructor (doc, componentId) {
     this.doc = doc
     this.id = componentId
@@ -9,7 +9,7 @@ export class Component {
   }
 }
 
-export class InputComponent extends Component {
+export class Input extends Component {
   get content () {
     return this.item.value
   }
@@ -19,7 +19,7 @@ export class InputComponent extends Component {
   }
 }
 
-export class ReadOnlyComponent extends Component {
+class ReadOnlyComponent extends Component {
   get content () {
     return this.item.textContent
   }
@@ -29,7 +29,7 @@ export class ReadOnlyComponent extends Component {
   }
 }
 
-export class ButtonComponent extends ReadOnlyComponent {
+export class Button extends ReadOnlyComponent {
   addListener (callback) {
     this.item.addEventListener('click', callback)
   }
@@ -62,23 +62,78 @@ export class NewProjectComponent {
   }
 }
 
-export class TaskComponent extends Component {
+export class Task extends Component {
   constructor (doc, componentId, projectName) {
     super(doc, componentId)
     this.projectName = projectName
+    this.task = ''
+    this.description = ''
+    this.dueDate = ''
+    this.priority = ''
+  }
+
+  #renderTitle () {
+    const elem = this.doc.createElement('input')
+    elem.classList.add('title')
+    elem.textContent = this.title
+    return elem
+  }
+
+  #renderDescription () {
+    const elem = this.doc.createElement('textarea')
+    elem.rows = 4
+    elem.cols = 35
+    elem.classList.add('description')
+    elem.textContent = this.description
+    return elem
+  }
+
+  #renderDueDate () {
+    const elem = this.doc.createElement('input')
+    elem.type = 'date'
+    elem.classList.add('due-date')
+    elem.textContent = this.dueDate
+    return elem
+  }
+
+  #renderPriority () {
+    const elem = this.doc.createElement('input')
+    elem.type = 'number'
+    elem.min = 1
+    elem.max = 5
+    elem.classList.add('priority')
+    elem.textContent = this.priority
+    return elem
+  }
+
+  render () {
+    console.log('render task id: ', this.id)
+    const task = this.doc.createElement('div')
+    task.id = this.id
+    task.classList.add('task')
+    task.append(
+      this.#renderTitle(),
+      this.#renderDescription(),
+      this.#renderDueDate(),
+      this.#renderPriority()
+    )
+    return task
   }
 }
 
-export class ProjectComponent extends Component {
-  constructor (doc, projectId, projectButton) {
+export class Project extends Component {
+  constructor (doc, projectId, projectName, projectButton) {
     super(doc, projectId)
+    this.projectName = projectName
     this.projectButton = projectButton
     this.projectButton.addListener(this.render.bind(this))
-    this.tasks = {}
+    this.tasks = []
   }
 
-  add (taskId) {
-    this.tasks[taskId] = new TaskComponent(this.doc, this.projectName)
+  add () {
+    const newTask = new Task(this.doc, `${this.projectId}${this.tasks.length}`, this.projectName)
+    this.tasks.push(newTask)
+    return newTask
   }
 
   remove (taskId) {
@@ -88,16 +143,36 @@ export class ProjectComponent extends Component {
   render () {
     // render the project
     console.log('render project id: ', this.id)
+    const taskContainer = this.doc.querySelector('#task-container')
+    taskContainer.innerHTML = ''
+    const title = this.doc.createElement('h2')
+    title.textContent = this.projectName
+
+    const taskList = this.doc.createElement('div')
+    taskList.classList.add('task-list')
+    taskList.append(...Object.values(this.tasks).map(task => {
+      return task.render()
+    }))
+
+    const newButton = new Button(this.doc, 'new-task-button')
+    const newTaskButton = newButton.render()
+    newTaskButton.textContent = 'New Task'
+    newTaskButton.type = 'button'
+    newTaskButton.addEventListener('click', () => {
+      const newTask = this.add()
+      taskList.appendChild(newTask.render())
+    })
+    taskContainer.append(title, taskList, newTaskButton)
   }
 }
 
-export class ProjectListComponent extends Component {
+export class ProjectList extends Component {
   constructor (doc, componentId) {
     super(doc, componentId)
     this.projects = {}
   }
 
-  createProjectId (projectName) {
+  #createProjectId (projectName) {
     let projectId = projectName.toLowerCase().replace(' ', '-')
     let i = 0
     let newId = projectId
@@ -112,9 +187,9 @@ export class ProjectListComponent extends Component {
   }
 
   add (projectName) {
-    const projectId = this.createProjectId(projectName)
+    const projectId = this.#createProjectId(projectName)
 
-    const projectButtonComponent = new ButtonComponent(this.doc, projectId)
+    const projectButtonComponent = new Button(this.doc, projectId)
 
     // display the new project button
     const projectButton = projectButtonComponent.render()
@@ -122,8 +197,9 @@ export class ProjectListComponent extends Component {
     projectButton.type = 'button'
     this.item.appendChild(projectButton)
 
-    const newProject = new ProjectComponent(this.doc, projectId, projectButtonComponent)
+    const newProject = new Project(this.doc, projectId, projectName, projectButtonComponent)
     this.projects[projectId] = newProject
+    return newProject
   }
 
   remove (projectId) {
@@ -136,24 +212,37 @@ export class ProjectListComponent extends Component {
   }
 }
 
-export class ProjectContainerComponent {
-  constructor (projectListComponent, newProjectComponent) {
-    this.projectListComponent = projectListComponent
-    this.newProjectComponent = newProjectComponent
-    this.newProjectComponent.addListener((event) => {
+class ContainerOfList {
+  constructor (listComponent, addListenerComponent) {
+    this.listComponent = listComponent
+    this.addListenerComponent = addListenerComponent
+    this.addListenerComponent.addListener((event) => {
       event.preventDefault()
       this.add()
     })
   }
 
-  static addListener (callback) {
-    this.newProjectComponent.addListener(callback)
+  add () {
+    console.log(`add ${this.listComponent.item.id} via ${this.buttonComponent.item.id}`)
   }
+}
 
+export class ProjectContainer extends ContainerOfList {
   /*
     * Takes data from newProjectComponent and adds it to the projectListComponent
   */
   add () {
-    this.projectListComponent.add(this.newProjectComponent.inputContent)
+    this.listComponent.add(this.addListenerComponent.inputContent)
+  }
+}
+
+export class TaskContainer extends ContainerOfList {
+  constructor (title, taskList, newTaskButton) {
+    super(taskList, newTaskButton)
+    this.title = title
+  }
+
+  add () {
+    this.taskList.add(this.title)
   }
 }
