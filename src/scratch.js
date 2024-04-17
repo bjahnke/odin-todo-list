@@ -10,12 +10,24 @@ class Component {
 }
 
 export class Input extends Component {
+  constructor (doc, componentId, tagName = 'input') {
+    super(doc, componentId)
+    this.tagName = tagName
+  }
+
   get content () {
     return this.item.value
   }
 
   set content (value) {
     this.item.value = value
+  }
+
+  render () {
+    const elem = this.doc.createElement(this.tagName)
+    elem.id = this.id
+    elem.classList.add('input')
+    return elem
   }
 }
 
@@ -62,48 +74,84 @@ export class NewProjectComponent {
   }
 }
 
-export class Task extends Component {
-  constructor (doc, componentId, projectName) {
+export class TaskField extends Component {
+  constructor (doc, componentId, inputComponent, labelText) {
     super(doc, componentId)
-    this.projectName = projectName
-    this.task = ''
+    this.inputComponent = inputComponent
+    this.labelText = labelText
+  }
+
+  #labelWrap (renderedElement, labelText) {
+    const label = this.doc.createElement('label')
+    label.textContent = labelText
+    const div = this.doc.createElement('div')
+    div.append(label, renderedElement)
+    div.className = 'input-field'
+    return div
+  }
+
+  render (inputClass) {
+    const input = this.inputComponent.render()
+    input.classList.add(inputClass)
+    return this.#labelWrap(input, this.labelText)
+  }
+}
+
+export class Task extends Component {
+  constructor (doc, componentId) {
+    super(doc, componentId)
+    this.title = ''
     this.description = ''
     this.dueDate = ''
     this.priority = ''
   }
 
-  #renderTitle () {
-    const elem = this.doc.createElement('input')
-    elem.classList.add('title')
-    elem.textContent = this.title
+  #labelWrap (renderedElement, labelText) {
+    const label = this.doc.createElement('label')
+    label.textContent = labelText
+    const div = this.doc.createElement('div')
+    div.append(label, renderedElement)
+    div.className = 'input-field'
+    return div
+  }
+
+  #renderItem (tag, value, taskPropName) {
+    const elem = this.doc.createElement(tag)
+    elem.classList.add('input', taskPropName)
+    elem.value = value
+    elem.addEventListener('input', (event) => {
+      this[taskPropName] = event.target.value
+    })
     return elem
   }
 
+  #renderTitle () {
+    return this.#renderItem('input', this.title, 'title')
+  }
+
   #renderDescription () {
-    const elem = this.doc.createElement('textarea')
+    const elem = this.#renderItem('textarea', this.description, 'description')
     elem.rows = 4
     elem.cols = 35
-    elem.classList.add('description')
-    elem.textContent = this.description
     return elem
   }
 
   #renderDueDate () {
-    const elem = this.doc.createElement('input')
+    const elem = this.#renderItem('input', this.dueDate, 'dueDate')
     elem.type = 'date'
-    elem.classList.add('due-date')
-    elem.textContent = this.dueDate
     return elem
   }
 
   #renderPriority () {
-    const elem = this.doc.createElement('input')
+    const elem = this.#renderItem('input', this.priority, 'priority')
     elem.type = 'number'
     elem.min = 1
     elem.max = 5
-    elem.classList.add('priority')
-    elem.textContent = this.priority
     return elem
+  }
+
+  #createListener (elem, prop) {
+
   }
 
   render () {
@@ -112,10 +160,10 @@ export class Task extends Component {
     task.id = this.id
     task.classList.add('task')
     task.append(
-      this.#renderTitle(),
-      this.#renderDescription(),
-      this.#renderDueDate(),
-      this.#renderPriority()
+      this.#labelWrap(this.#renderTitle(), 'Title'),
+      this.#labelWrap(this.#renderDescription(), 'Description'),
+      this.#labelWrap(this.#renderDueDate(), 'Due Date'),
+      this.#labelWrap(this.#renderPriority(), 'Priority')
     )
     return task
   }
@@ -131,7 +179,7 @@ export class Project extends Component {
   }
 
   add () {
-    const newTask = new Task(this.doc, `${this.projectId}${this.tasks.length}`, this.projectName)
+    const newTask = new Task(this.doc, `${this.id}${this.tasks.length}`)
     this.tasks.push(newTask)
     return newTask
   }
@@ -161,6 +209,7 @@ export class Project extends Component {
     newTaskButton.addEventListener('click', () => {
       const newTask = this.add()
       taskList.appendChild(newTask.render())
+      window.scrollTo(0, document.body.scrollHeight)
     })
     taskContainer.append(title, taskList, newTaskButton)
   }

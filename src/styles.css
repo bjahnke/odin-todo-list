@@ -101,7 +101,7 @@ h2 {
     top: 10%;
 }
 
-.task .input.due-date {
+.task .input.dueDate {
     flex: 0 0 auto;
 }
 

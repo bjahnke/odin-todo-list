@@ -11,7 +11,6 @@ class Main {
 
     const defaultProject = projectListComponent.add('Default Project')
     defaultProject.render()
-    // render the default project list
   }
 
   static renderProjectList () {}
