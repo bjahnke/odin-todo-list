@@ -81,12 +81,12 @@ h2 {
     gap: 2px;
 }
 
-.delete {
+.delete-task-button {
     cursor: pointer;
     align-self: end;
 }
 
-.delete:hover {
+.delete-task-button:hover {
     color: red;
 }
 

@@ -105,8 +105,10 @@ export class TaskField extends Component {
 }
 
 export class Task extends Component {
-  constructor (doc, componentId) {
+  constructor (doc, componentId, project) {
     super(doc, componentId)
+    this.deleteButton = new Button(doc, `${this.id}-delete`)
+    this.project = project
     this.title = ''
     this.description = ''
     this.dueDate = ''
@@ -157,16 +159,22 @@ export class Task extends Component {
     return elem
   }
 
-  #createListener (elem, prop) {
-
-  }
-
   render () {
     console.log('render task id: ', this.id)
     const task = this.doc.createElement('div')
     task.id = this.id
     task.classList.add('task')
+
+    const deleteButton = this.deleteButton.render()
+    deleteButton.textContent = 'X'
+    deleteButton.type = 'button'
+    deleteButton.classList.add('delete-task-button')
+    deleteButton.addEventListener('click', () => {
+      task.remove()
+      this.project.remove(this)
+    })
     task.append(
+      deleteButton,
       this.#labelWrap(this.#renderTitle(), 'Title'),
       this.#labelWrap(this.#renderDescription(), 'Description'),
       this.#labelWrap(this.#renderDueDate(), 'Due Date'),
@@ -186,13 +194,13 @@ export class Project extends Component {
   }
 
   add () {
-    const newTask = new Task(this.doc, `${this.id}${this.tasks.length}`)
+    const newTask = new Task(this.doc, `${this.id}${this.tasks.length}`, this)
     this.tasks.push(newTask)
     return newTask
   }
 
-  remove (taskId) {
-    delete this.tasks[taskId]
+  remove (task) {
+    this.tasks = this.tasks.filter(t => t !== task)
   }
 
   /*
@@ -257,7 +265,7 @@ export class ProjectList extends Component {
     delete this.projects[projectId]
   }
 
-  renderTaskList() {
+  renderTaskList () {
     // render the project list
     console.log('render project list')
     const taskList = this.doc.createElement('div')
