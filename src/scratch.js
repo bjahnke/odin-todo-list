@@ -44,6 +44,13 @@ class ReadOnlyComponent extends Component {
 export class Button extends ReadOnlyComponent {
   addListener (callback) {
     this.item.addEventListener('click', callback)
+    this.listenerInfo = ['click', callback]
+  }
+
+  removeListener () {
+    if (this.removeListener) {
+      this.item.removeEventListener(...this.listenerInfo)
+    }
   }
 
   render () {
@@ -188,30 +195,25 @@ export class Project extends Component {
     delete this.tasks[taskId]
   }
 
-  render () {
+  /*
+  wraps the task list render with the project title and new task button
+  */
+  renderWrapper (renderTaskCallback) {
     // render the project
-    console.log('render project id: ', this.id)
-    const taskContainer = this.doc.querySelector('#task-container')
-    taskContainer.innerHTML = ''
-    const title = this.doc.createElement('h2')
-    title.textContent = this.projectName
+    renderTaskContainer.bind(this)(renderTaskCallback)
+  }
 
+  render () {
+    this.renderWrapper(this.renderTaskList.bind(this))
+  }
+
+  renderTaskList () {
+    // render the task list
+    console.log('render task list')
     const taskList = this.doc.createElement('div')
     taskList.classList.add('task-list')
-    taskList.append(...Object.values(this.tasks).map(task => {
-      return task.render()
-    }))
-
-    const newButton = new Button(this.doc, 'new-task-button')
-    const newTaskButton = newButton.render()
-    newTaskButton.textContent = 'New Task'
-    newTaskButton.type = 'button'
-    newTaskButton.addEventListener('click', () => {
-      const newTask = this.add()
-      taskList.appendChild(newTask.render())
-      window.scrollTo(0, document.body.scrollHeight)
-    })
-    taskContainer.append(title, taskList, newTaskButton)
+    taskList.append(...Object.values(this.tasks).map(task => task.render()))
+    return taskList
   }
 }
 
@@ -255,9 +257,21 @@ export class ProjectList extends Component {
     delete this.projects[projectId]
   }
 
-  render () {
+  renderTaskList() {
     // render the project list
     console.log('render project list')
+    const taskList = this.doc.createElement('div')
+    taskList.classList.add('task-list')
+
+    taskList.append(...Object.values(this.projects)
+      .flatMap(project => project.tasks
+        .map(task => task.render())
+      ))
+    return taskList
+  }
+
+  render () {
+    renderTaskContainer.bind(this)(this.renderTaskList.bind(this))
   }
 }
 
@@ -294,4 +308,29 @@ export class TaskContainer extends ContainerOfList {
   add () {
     this.taskList.add(this.title)
   }
+}
+
+/*
+wraps the task list render with the project title and new task button
+*/
+function renderTaskContainer (renderTaskCallback) {
+  // render the project
+  console.log('render project id: ', this.id)
+  const taskContainer = this.doc.querySelector('#task-container')
+  taskContainer.innerHTML = ''
+  const title = this.doc.createElement('h2')
+  title.textContent = this.projectName
+
+  const taskList = renderTaskCallback()
+
+  const newButton = new Button(this.doc, 'new-task-button')
+  const newTaskButton = newButton.render()
+  newTaskButton.textContent = 'New Task'
+  newTaskButton.type = 'button'
+  newTaskButton.addEventListener('click', () => {
+    const newTask = this.add()
+    taskList.appendChild(newTask.render())
+    window.scrollTo(0, document.body.scrollHeight)
+  })
+  taskContainer.append(title, taskList, newTaskButton)
 }

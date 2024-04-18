@@ -10,6 +10,10 @@ class Main {
     const projectContainerComponent = new component.ProjectContainer(projectListComponent, newProjectComponent)
 
     const defaultProject = projectListComponent.add('Default Project')
+    defaultProject.projectButton.removeListener()
+    defaultProject.projectButton.addListener(() => {
+      defaultProject.renderWrapper(projectListComponent.renderTaskList.bind(projectListComponent))
+    })
     defaultProject.render()
   }
 
